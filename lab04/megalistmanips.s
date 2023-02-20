@@ -15,12 +15,12 @@ main:
     jal create_default_list
     mv s0, a0   # v0 = s0 is head of node list
 
-    #print "lists before: "
+    # print "lists before: "
     la a1, start_msg
     li a0, 4
     ecall
 
-    #print the list
+    # print the list
     add a0, s0, x0
     jal print_list
 
@@ -66,20 +66,21 @@ map:
     # are modified by the callees, even when we know the content inside the functions 
     # we call. this is to enforce the abstraction barrier of calling convention.
 mapLoop:
-    add t1, s0, x0      # load the address of the array of current node into t1
+    lw t1, 0(s0)        # load the address of the array of current node into t1. FIX_4
     lw t2, 4(s0)        # load the size of the node's array into t2
 
-    add t1, t1, t0      # offset the array address by the count
+    slli a0, t0, 2      # FIX_2
+    add t1, t1, a0      # offset the array address by the count. FIX_2
     lw a0, 0(t1)        # load the value at that address into a0
 
-    jalr s1             # call the function on that value.
+    jalr ra, s1, 0      # call the function on that value. FIX_1
 
     sw a0, 0(t1)        # store the returned value back into the array
-    addi t0, t0, 1      # increment the count
+    addi t0, t0, 1      # increment the count.
     bne t0, t2, mapLoop # repeat if we haven't reached the array size yet
 
-    la a0, 8(s0)        # load the address of the next node into a0
-    lw a1, 0(s1)        # put the address of the function back into a1 to prepare for the recursion
+    lw a0, 8(s0)        # load the address of the next node into a0. FIX_5
+    mv a1, s1           # put the address of the function back into a1 to prepare for the recursion. FIX_5
 
     jal  map            # recurse
 done:
@@ -90,8 +91,8 @@ done:
     jr ra
 
 mystery:
-    mul t1, a0, a0
-    add a0, t1, a0
+    mul a1, a0, a0 # FIX_3
+    add a0, a0, a1
     jr ra
 
 create_default_list:
@@ -101,7 +102,7 @@ create_default_list:
     li s1, 0  # number of nodes handled
     li s2, 5  # size
     la s3, arrays
-loop: #do...
+loop: # do...
     li a0, 12
     jal malloc      # get memory for the next node
     mv s4, a0
