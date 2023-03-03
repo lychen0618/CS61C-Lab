@@ -21,7 +21,8 @@ array:	.word	2048		# max array size specified in BYTES (DO NOT CHANGE)
 .text
 ##################################################################################################
 # You MAY change the code below this section
-main:	li	a0, 256		# array size in BYTES (power of 2 < array size)
+main:	
+	li	a0, 256		# array size in BYTES (power of 2 < array size)
 	li	a1, 2		# step size  (power of 2 > 0)
 	li	a2, 1		# rep count  (int > 0)
 	li	a3, 1		# 0 - option 0, 1 - option 1
@@ -29,9 +30,9 @@ main:	li	a0, 256		# array size in BYTES (power of 2 < array size)
 ##################################################################################################
 
 	jal	accessWords	# lw/sw
-	#jal	accessBytes	# lb/sb
+	# jal accessBytes	# lb/sb
 
-	li	a0,10		# exit
+	li	a0, 10		# exit
 	ecall
 
 # SUMMARY OF REGISTER USE:
@@ -45,12 +46,12 @@ main:	li	a0, 256		# array size in BYTES (power of 2 < array size)
 accessWords:
 	la	s0, array		# ptr to array
 	add	s1, s0, a0		# hardcode array limit (ptr)
-	slli	t1, a1, 2		# multiply stepsize by 4 because WORDS
+	slli t1, a1, 2		# multiply stepsize by 4 because WORDS
 wordLoop:
 	beq	a3, zero,  wordZero
 
 	lw	t0, 0(s0)		# array[index/4]++
-	addi	t0, t0, 1
+	addi t0, t0, 1
 	sw	t0, 0(s0)
 	j	wordCheck
 
